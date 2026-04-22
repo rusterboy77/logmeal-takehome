@@ -1,0 +1,74 @@
+{
+  "info": {
+    "name": "LogMeal Take-Home \u2014 Candidate Spec",
+    "_postman_id": "candidate-spec",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/api/health"
+      }
+    },
+    {
+      "name": "Upload",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/api/upload_image",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": "tests/assets/test.png"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/api/list_images"
+      }
+    },
+    {
+      "name": "Analyse",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/api/analyse_image",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"image_id\": \"test.png\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Share token",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/api/share_image",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"image_id\": \"test.png\"\n}"
+        }
+      }
+    }
+  ]
+}
