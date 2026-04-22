@@ -4,7 +4,7 @@ Resolution of the LogMeal Take-Home test.
 
 As a student, my previous experience with Python and Flask was limited. However, I took this challenge as an opportunity to learn, adapt quickly, and build a fully functional prototype fulfilling all the core requirements within the 6-8 hours limit.
 
-## 🚀 How to run the project
+## How to run the project
 
 To start the application, simply run the following command in the root folder:
 
@@ -15,12 +15,16 @@ docker-compose up --build
 - The **Frontend** will be available at: `http://localhost:3000`
 - The **Backend API** will be running at: `http://localhost:8000`
 
-## 🧠 Trade-offs and Decisions
+## Trade-offs and Decisions
 
 Given the time constraints and my learning curve with Python, I made the following decisions:
 1. **In-Memory Database:** Instead of setting up a full relational database, I used Python dictionaries (`images_db` and `shares_db`) to store records temporarily. 
 2. **Analyse Endpoint Mocking:** Since there is no real AI processing available, the `/api/analyse_image` endpoint reads the real file from the File System using `os.path.getsize()` and returns real metadata (file size in KB and original name).
 3. **Share Link TTL:** The 10-minute expiration is handled using Python's `datetime` library comparing the current time with the `expires_at` timestamp.
+
+## Extra Features Implemented
+
+- **CI (GitHub Actions):** I have added a GitHub Actions workflow (`.github/workflows/main.yml`) that automatically builds the Docker images on every push to the `main` branch. This ensures the application is always buildable and demonstrates basic Continuous Integration (CI) practices.
 
 ---
 

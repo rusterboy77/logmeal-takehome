@@ -1,0 +1,20 @@
+name: CI Pipeline - Build & Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker images
+      run: docker-compose build
+
+    - name: Verify build completion
+      run: echo "Docker images built successfully!"
