@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>LogMeal — Candidate Frontend (Placeholder)</title>
+</head>
+<body style="font-family: system-ui, sans-serif; max-width: 900px; margin: 2rem auto;">
+  <h1>Candidate Frontend</h1>
+  <p>Implement your UI here.</p>
+  <section>
+    <h2>Upload</h2>
+    <form id="uploadForm">
+      <input type="file" id="imageInput" name="image" required accept="image/*">
+      <button type="submit">Upload Image</button>
+    </form>
+    <p id="uploadStatus"></p>
+  </section>
+  <section>
+    <h2>List & Share</h2>
+    <button id="loadImagesBtn">Load Images</button>
+    <div id="imagesGallery" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;"></div>
+  </section>
+  <section>
+    <h2>Analyse</h2>
+    <form id="analyseForm">
+      <input type="text" id="analyseIdInput" placeholder="Pega el ID de la imagen" required style="width: 250px;">
+      <button type="submit">Analyse Image</button>
+    </form>
+    <pre id="analyseResult" style="background: #f4f4f4; padding: 10px; margin-top: 10px; display: none;"></pre>
+  </section>
+
+  <script>
+    // --- LOGICA DE SUBIDA (UPLOAD) ---
+    document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Evitamos que la página se recargue
+        
+        const fileInput = document.getElementById('imageInput');
+        const statusMsg = document.getElementById('uploadStatus');
+        
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        
+        statusMsg.style.color = 'blue';
+        statusMsg.innerText = "Uploading... please wait.";
+
+        try {
+            const response = await fetch('/api/upload_image', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            statusMsg.style.color = 'green';
+            statusMsg.innerText = "Upload successful! Image ID: " + data.image_id;
+        } catch (error) {
+            statusMsg.style.color = 'red';
+            statusMsg.innerText = "Connection error.";
+        }
+    });
+
+    // --- LOGICA DE LISTAR IMÁGENES ---
+    document.getElementById('loadImagesBtn').addEventListener('click', async function() {
+        const gallery = document.getElementById('imagesGallery');
+        gallery.innerHTML = "Cargando imágenes...";
+
+        try {
+            const response = await fetch('/api/list_images');
+            const data = await response.json();
+            
+            gallery.innerHTML = ""; // Limpiamos el texto de carga
+            
+            if (data.items.length === 0) {
+                gallery.innerHTML = "<p>No hay imágenes subidas aún.</p>";
+                return;
+            }
+
+            // Por cada imagen devuelta, creamos un bloque HTML
+            data.items.forEach(item => {
+                const div = document.createElement('div');
+                div.style.border = "1px solid #ccc";
+                div.style.padding = "10px";
+                div.style.textAlign = "center";
+                
+                // Usamos innerHTML para meter la imagen y el texto rápido
+                div.innerHTML = `
+                    <img src="${item.url}" style="max-width: 150px; display: block; margin-bottom: 10px;">
+                    <p style="font-size: 12px; margin:0;">ID: ${item.image_id.substring(0, 8)}...</p>
+                    <button onclick="compartirImagen('${item.image_id}')" style="margin-top: 5px; cursor: pointer;">Share Link</button>
+                `;
+                gallery.appendChild(div);
+            });
+        } catch (error) {
+            gallery.innerHTML = "<p style='color:red;'>Error al cargar las imágenes.</p>";
+        }
+    });
+
+    // --- LOGICA DE ANALIZAR ---
+    document.getElementById('analyseForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const imageId = document.getElementById('analyseIdInput').value;
+        const resultBox = document.getElementById('analyseResult');
+        
+        resultBox.style.display = "block";
+        resultBox.innerText = "Analizando con IA simulada...";
+        
+        try {
+            // Llamamos a la API enviando un JSON (no un FormData)
+            const response = await fetch('/api/analyse_image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_id: imageId })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Convertimos el objeto JSON a texto con formato bonito
+                resultBox.innerText = JSON.stringify(data.analysis, null, 2);
+            } else {
+                resultBox.innerText = "Error: " + (data.error || "No encontrado");
+            }
+        } catch (error) {
+            resultBox.innerText = "Error de conexión.";
+        }
+    });
+
+    // --- LOGICA DE COMPARTIR ---
+    // Usamos window.compartirImagen para que el botón creado dinámicamente pueda acceder a la función
+    window.compartirImagen = async function(imageId) {
+        try {
+            const response = await fetch('/api/share_image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_id: imageId })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert("¡Enlace generado!\nCopia y pega esto en tu navegador:\n\n" + data.url + "\n\nCaduca a las: " + new Date(data.expires_at).toLocaleTimeString());
+            } else {
+                alert("Error: " + data.error);
+            }
+        } catch (error) {
+            alert("Error de conexión al intentar compartir.");
+        }
+    };
+  </script>
+</body>
+</html>
