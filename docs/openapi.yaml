@@ -1,0 +1,110 @@
+openapi: 3.0.3
+info:
+  title: LogMeal Take-Home API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/upload_image:
+    post:
+      summary: Upload an image file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  image_id: { type: string }
+        '400':
+          description: Bad request
+  /api/list_images:
+    get:
+      summary: List uploaded images
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        image_id: { type: string }
+                        url: { type: string }
+  /api/analyse_image:
+    post:
+      summary: Analyse an image by id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [image_id]
+              properties:
+                image_id: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  image_id: { type: string }
+                  analysis:
+                    type: object
+        '400': { description: Bad request }
+        '404': { description: Not found }
+  /api/share_image:
+    post:
+      summary: Generate a 10min share token for an image
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [image_id]
+              properties:
+                image_id: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  url: { type: string }
+                  expires_at: { type: string, format: date-time }
+  /s/{token}:
+    get:
+      summary: Public page for a shared image (HTML)
+      parameters:
+        - in: path
+          name: token
+          schema: { type: string }
+          required: true
+      responses:
+        '200': { description: HTML page }
+        '404': { description: Invalid token }
+        '410': { description: Expired token }
