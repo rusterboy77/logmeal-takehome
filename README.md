@@ -25,6 +25,7 @@ Given the time constraints and my learning curve with Python, I made the followi
 ## Extra Features Implemented
 
 - **CI (GitHub Actions):** I have added a GitHub Actions workflow (`.github/workflows/main.yml`) that automatically builds the Docker images on every push to the `main` branch. This ensures the application is always buildable and demonstrates basic Continuous Integration (CI) practices.
+- **Swagger UI:** The API documentation is interactively served using `flask-swagger-ui`. It can be accessed at `http://localhost:3000/docs/`, reading directly from the provided `openapi.yaml` specification.
 
 ---
 

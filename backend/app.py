@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
+from flask_swagger_ui import get_swaggerui_blueprint
 import os
 import uuid
 from datetime import datetime, timedelta
@@ -168,3 +169,16 @@ def shared_page(token):
 @app.route('/uploads/<filename>', methods=['GET'])
 def serve_image(filename):
     return send_from_directory(UPLOAD_DIR, filename)
+
+# --- ENDPOINT 7: SWAGGER UI (DOCUMENTACIÓN INTERACTIVA) ---
+SWAGGER_URL = '/docs'
+API_URL = '/static_docs/openapi.yaml'
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL, API_URL, config={'app_name': "LogMeal API"}
+)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+@app.route('/static_docs/<path:filename>')
+def serve_docs(filename):
+    return send_from_directory('/app/docs', filename)
